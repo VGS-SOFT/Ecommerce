@@ -1,0 +1,842 @@
+{% extends 'base.html' %} {% block tags %} {% load static %} {% endblock %} {% block stylesheets %}
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+/>
+<link
+  rel="stylesheet"
+  href="{% static 'plugins/fontawesome-free/css/all.min.css' %}"
+/>
+<link
+  rel="stylesheet"
+  href="{% static 'plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}"
+/>
+<link
+  rel="stylesheet"
+  href="{% static 'plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}"
+/>
+<link
+  rel="stylesheet"
+  href="{% static 'plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}"
+/>
+<link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}" />
+<link
+  rel="stylesheet"
+  href="{% static 'plugins/dropzone/min/dropzone.min.css' %}"
+/>
+
+{% endblock stylesheets %}
+
+{% block content %}
+<!-- New Data -->
+<!-- Modal Start -->
+<div class="modal fade" id="modal">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Product</h4>
+        <button
+          type="button"
+          class="close"
+          id="close_btn"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form
+          class="form-horizontal"
+          id="product_form"
+          enctype="multipart/form-data"
+        >
+          {% csrf_token %}
+          <input type="hidden" name="PId" id="PId" value="0" />
+          <div class="card-body">
+            <div class="form-group row">
+              <label class="col-sm-2 col-form-label">Category</label>
+              <div class="col-sm-10">
+                <select class="form-control" name="subcat2" id="subcat2">
+                  <!-- Option Are Dynamic -->
+                </select>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="Product Code" class="col-sm-2 col-form-label"
+                >Product Code</label
+              >
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  name="product_code"
+                  class="form-control"
+                  id="ProductCode"
+                  placeholder="Product Code"
+                />
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="Product Name" class="col-sm-2 col-form-label"
+                >Product Name</label
+              >
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  name="product_name"
+                  id="ProductName"
+                  placeholder="Product Name"
+                />
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="Product Description" class="col-sm-2 col-form-label"
+                >Product Description</label
+              >
+              <div class="col-sm-10">
+                <textarea
+                  class="form-control"
+                  id="Product Description"
+                  placeholder="Product Description"
+                  name="product_description"
+                ></textarea>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="Product Details" class="col-sm-2 col-form-label"
+                >Product Details</label
+              >
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  name="product_detail"
+                  id="ProductDetails"
+                  placeholder="Product Details"
+                />
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="Price" class="col-sm-2 col-form-label">Price</label>
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  name="price"
+                  id="Price"
+                  placeholder="Price"
+                />
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="Discount Percentage" class="col-sm-2 col-form-label"
+                >Discount Percentage</label
+              >
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  name="discount_percentage"
+                  class="form-control"
+                  id="Discount-Percentage"
+                  placeholder="Discount Percentage"
+                />
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="Discount Price" class="col-sm-2 col-form-label"
+                >Discount Price</label
+              >
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  name="discount_price"
+                  class="form-control"
+                  id="Discount-Price"
+                  readonly
+                />
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="ProductImgPath" class="col-sm-2 col-form-label"
+                >Product Image</label
+              >
+              <!-- <div class="col-sm-10">
+                <input
+                  type="file"
+                  name="path"
+                  id="path"
+                  multiple
+                  placeholder="path"
+                />
+                <span id="filenameDisplay"></span>
+              </div> -->
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="card card-default">
+                    {% comment %}
+                    <div class="card-header">
+                      <h3 class="card-title">
+                        Dropzone.js <small><em>jQuery File Upload</em> like look</small>
+                      </h3>
+                    </div>
+                    {% endcomment %}
+                    <div class="card-body">
+                      <div id="actions" class="row">
+                        <div class="col-lg-6">
+                          <div class="btn-group w-100">
+                            <span class="btn btn-success col fileinput-button start">
+                              <i class="fas fa-plus"></i>
+                              <span>Add files</span>
+                            </span>
+                            {% comment %}
+                            <button type="submit" class="btn btn-primary col start">
+                              <i class="fas fa-upload"></i>
+                              <span>Start upload</span>
+                            </button>
+                            {% endcomment %}
+                            <button type="reset" class="btn btn-warning col cancel">
+                              <i class="fas fa-times-circle"></i>
+                              <span>Cancel</span>
+                            </button>
+                          </div>
+                        </div>
+                        <div class="col-lg-6 d-flex align-items-center">
+                          <div class="fileupload-process w-100">
+                            <div
+                              id="total-progress"
+                              class="progress progress-striped active"
+                              role="progressbar"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                              aria-valuenow="0"
+                            >
+                              <div
+                                class="progress-bar progress-bar-success"
+                                style="width: 0%"
+                                data-dz-uploadprogress
+                              ></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="table table-striped files" id="previews">
+                        <div id="template" class="row mt-2">
+                          <div class="col-auto">
+                            <span class="preview"
+                              ><img src="data:," alt="" data-dz-thumbnail
+                            /></span>
+                          </div>
+                          <div class="col d-flex align-items-center">
+                            <p class="mb-0">
+                              <span class="lead" data-dz-name></span>
+                              (<span data-dz-size></span>)
+                            </p>
+                            <strong class="error text-danger" data-dz-errormessage></strong>
+                          </div>
+                          <div class="col-4 d-flex align-items-center">
+                            <div
+                              class="progress progress-striped active w-100"
+                              role="progressbar"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                              aria-valuenow="0"
+                            >
+                              <div
+                                class="progress-bar progress-bar-success"
+                                style="width: 0%"
+                                data-dz-uploadprogress
+                              ></div>
+                            </div>
+                          </div>
+                          <div class="col-auto d-flex align-items-center">
+                            <div class="btn-group">
+                              <button class="btn btn-primary start">
+                                <i class="fas fa-upload"></i>
+                                <span>Start</span>
+                              </button>
+                              {% comment %}
+                              <button data-dz-remove class="btn btn-warning cancel">
+                                <i class="fas fa-times-circle"></i>
+                                <span>Cancel</span>
+                              </button>
+                              {% endcomment %}
+                              <button data-dz-remove class="btn btn-danger delete">
+                                <i class="fas fa-trash"></i>
+                                <span>Delete</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- /.card-body -->
+                    {% comment %}
+                    <div class="card-footer">
+                      Visit
+                      <a href="https://www.dropzonejs.com">dropzone.js documentation</a> for
+                      more examples and information about the plugin.
+                    </div>
+                    {% endcomment %}
+                  </div>
+                  <!-- /.card -->
+                </div>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="SizeSQty" class="col-sm-2 col-form-label"
+                >SizeSQty</label
+              >
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  name="s"
+                  id="SizeSQty"
+                  placeholder="SizeSQty"
+                />
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="SizeMQty" class="col-sm-2 col-form-label"
+                >SizeMQty</label
+              >
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  name="m"
+                  id="SizeMQty"
+                  placeholder="SizeMQty"
+                />
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="SizeLQty" class="col-sm-2 col-form-label"
+                >SizeLQty</label
+              >
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  name="l"
+                  id="SizeLQty"
+                  placeholder="SizeLQty"
+                />
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="SizeXLQty" class="col-sm-2 col-form-label"
+                >SizeXLQty</label
+              >
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  name="xl"
+                  id="SizeXLQty"
+                  placeholder="SizeXLQty"
+                />
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="SizeXXLQty" class="col-sm-2 col-form-label"
+                >SizeXXLQty</label
+              >
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  name="xxl"
+                  id="SizeXXLQty"
+                  placeholder="SizeXXLQty"
+                />
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="Size3XLQty" class="col-sm-2 col-form-label"
+                >Size3XLQty</label
+              >
+              <div class="col-sm-10">
+                <input
+                  type="text"
+                  class="form-control"
+                  name="3xl"
+                  id="Size3XLQty"
+                  placeholder="Size3XLQty"
+                />
+              </div>
+            </div>
+            <!-- <div class="form-group row">
+                            <label for="CreatedBy" class="col-sm-2 col-form-label">CreatedBy</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" id="get_users" name="User">
+                                    // It will be ydnamically used by ajax
+                                </select>
+                            </div>
+                        </div> -->
+          </div>
+          <div class="card-footer">
+            <!-- <button type="button" class="btn btn-info" id="btn_save_draft">Save as Draft</button> -->
+            <button type="button" id="btn_publish" class="btn btn-info">
+              Publish
+            </button>
+            <button
+              type="button"
+              id="btn_close_modal"
+              class="btn btn-default float-right"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End -->
+
+<!-- Update Modal -->
+<!-- End Modal -->
+
+<!-- Data Table -->
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">All Product's</h3>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <button class="btn btn-default" id="btn_product">Add new product</button>
+  </div>
+  <div class="card-body">
+    <table id="table" class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>PId</th>
+          <th>Product Code</th>
+          <th>Product Name</th>
+          <th>Price</th>
+          <th>ProductDetails</th>
+          <th>Discount Price</th>
+          <th>Discount Percentage</th>
+          <th>Rating</th>
+          <th>Product Img</th>
+          <th>Size S Qty</th>
+          <th>Size M Qty</th>
+          <th>Size L Qty</th>
+          <th>Size XL Qty</th>
+          <th>Size XXL Qty</th>
+          <th>Size 3XL Qty</th>
+          <th>Category</th>
+          <th>Created By</th>
+          <th>CreatedOn</th>
+          <th>Modified By</th>
+          <th>Modified On</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!--Getting data by ajax-->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% comment %} For Image Upload {% endcomment %}
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-default">
+      {% comment %}
+      <div class="card-header">
+        <h3 class="card-title">
+          Dropzone.js <small><em>jQuery File Upload</em> like look</small>
+        </h3>
+      </div>
+      {% endcomment %}
+      <div class="card-body">
+        <div id="actions" class="row">
+          <div class="col-lg-6">
+            <div class="btn-group w-100">
+              <span class="btn btn-success col fileinput-button start">
+                <i class="fas fa-plus"></i>
+                <span>Add files</span>
+              </span>
+              {% comment %}
+              <button type="submit" class="btn btn-primary col start">
+                <i class="fas fa-upload"></i>
+                <span>Start upload</span>
+              </button>
+              {% endcomment %}
+              <button type="reset" class="btn btn-warning col cancel">
+                <i class="fas fa-times-circle"></i>
+                <span>Cancel</span>
+              </button>
+            </div>
+          </div>
+          <div class="col-lg-6 d-flex align-items-center">
+            <div class="fileupload-process w-100">
+              <div
+                id="total-progress"
+                class="progress progress-striped active"
+                role="progressbar"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="0"
+              >
+                <div
+                  class="progress-bar progress-bar-success"
+                  style="width: 0%"
+                  data-dz-uploadprogress
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="table table-striped files" id="previews">
+          <div id="template" class="row mt-2">
+            <div class="col-auto">
+              <span class="preview"
+                ><img src="data:," alt="" data-dz-thumbnail
+              /></span>
+            </div>
+            <div class="col d-flex align-items-center">
+              <p class="mb-0">
+                <span class="lead" data-dz-name></span>
+                (<span data-dz-size></span>)
+              </p>
+              <strong class="error text-danger" data-dz-errormessage></strong>
+            </div>
+            <div class="col-4 d-flex align-items-center">
+              <div
+                class="progress progress-striped active w-100"
+                role="progressbar"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="0"
+              >
+                <div
+                  class="progress-bar progress-bar-success"
+                  style="width: 0%"
+                  data-dz-uploadprogress
+                ></div>
+              </div>
+            </div>
+            <div class="col-auto d-flex align-items-center">
+              <div class="btn-group">
+                <button class="btn btn-primary start">
+                  <i class="fas fa-upload"></i>
+                  <span>Start</span>
+                </button>
+                {% comment %}
+                <button data-dz-remove class="btn btn-warning cancel">
+                  <i class="fas fa-times-circle"></i>
+                  <span>Cancel</span>
+                </button>
+                {% endcomment %}
+                <button data-dz-remove class="btn btn-danger delete">
+                  <i class="fas fa-trash"></i>
+                  <span>Delete</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /.card-body -->
+      {% comment %}
+      <div class="card-footer">
+        Visit
+        <a href="https://www.dropzonejs.com">dropzone.js documentation</a> for
+        more examples and information about the plugin.
+      </div>
+      {% endcomment %}
+    </div>
+    <!-- /.card -->
+  </div>
+</div>
+<!-- End -->
+{% endblock %}
+
+<!-- ... (Other script includes) ... -->
+{% block extrascripts %}
+<script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/jszip/jszip.min.js' %}"></script>
+<script src="{% static 'plugins/pdfmake/pdfmake.min.js' %}"></script>
+<script src="{% static 'plugins/pdfmake/vfs_fonts.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+<script src="{% static 'plugins/dropzone/min/dropzone.min.js' %}"></script>
+
+{% csrf_token %}
+
+<script>
+  document
+    .getElementById("Price")
+    .addEventListener("input", calculateDiscountPrice);
+  document
+    .getElementById("Discount-Percentage")
+    .addEventListener("input", calculateDiscountPrice);
+
+  // Function to calculate the discount price
+  function calculateDiscountPrice() {
+    // Get the values entered by the user
+    var price = parseFloat(document.getElementById("Price").value) || 0;
+    var discountPercentage =
+      parseFloat(document.getElementById("Discount-Percentage").value) || 0;
+
+    // Calculate the discount price
+    var discountPrice = price - price * (discountPercentage / 100);
+
+    // Update the Discount Price input field with the calculated value
+    document.getElementById("Discount-Price").value = discountPrice.toFixed(2);
+  }
+  // csrf token
+  var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+  $(document).ready(function () {
+    Dropzone.autoDiscover = false; //Drip-Xone Error
+    var previewNode = document.querySelector("#template");
+    previewNode.id = "";
+    var previewTemplate = previewNode.parentNode.innerHTML;
+    previewNode.parentNode.removeChild(previewNode);
+    var myDropzone = new Dropzone(document.body, {
+      // Make the whole body a dropzone
+      url: "/target-url", // Set the url
+      thumbnailWidth: 80,
+      thumbnailHeight: 80,
+      parallelUploads: 20,
+      previewTemplate: previewTemplate,
+      autoQueue: false, // Make sure the files aren't queued until manually added
+      previewsContainer: "#previews", // Define the container to display the previews
+      clickable: ".fileinput-button", // Define the element that should be used as click trigger to select files.
+    });
+    myDropzone.on("addedfile", function (file) {
+      // Hookup the start button
+      file.previewElement.querySelector(".start").onclick = function () {
+        myDropzone.enqueueFile(file);
+      };
+    });
+
+    // Update the total progress bar
+    myDropzone.on("totaluploadprogress", function (progress) {
+      document.querySelector("#total-progress .progress-bar").style.width =
+        progress + "%";
+    });
+
+    myDropzone.on("sending", function (file) {
+      // Show the total progress bar when upload starts
+      document.querySelector("#total-progress").style.opacity = "1";
+      // And disable the start button
+      file.previewElement
+        .querySelector(".start")
+        .setAttribute("disabled", "disabled");
+    });
+
+    // Hide the total progress bar when nothing's uploading anymore
+    myDropzone.on("queuecomplete", function (progress) {
+      document.querySelector("#total-progress").style.opacity = "0";
+    });
+
+    // Setup the buttons for all transfers
+    // The "add files" button doesn't need to be setup because the config
+    // `clickable` has already been specified.
+    document.querySelector("#actions .start").onclick = function () {
+      myDropzone.enqueueFiles(myDropzone.getFilesWithStatus(Dropzone.ADDED));
+    };
+    document.querySelector("#actions .cancel").onclick = function () {
+      myDropzone.removeAllFiles(true);
+    };
+
+    // Open Modal
+    $("#btn_product").click(function () {
+      $("#modal form")[0].reset();
+      $("#filenameDisplay").empty();
+      GetSubCat2();
+      $("#modal").modal("show");
+    });
+
+    // Add Data function call on publish btn
+    $("#btn_publish").click(function () {
+      AddDate();
+      table.ajax.reload();
+    });
+
+    // Close Modal
+    $("#btn_close_modal").click(function () {
+      CloseModal();
+    });
+
+    // Show Data into Datatable
+    // debugger
+    table = $("#table").DataTable({
+      paging: false,
+      // pageLength: 4,
+      // lengthMenu: [4,8,12,16,100],
+      scrollX: true, // Enable horizontal scrolling
+      scrollCollapse: true,
+      scrollY: "254px",
+      ajax: {
+        url: "{% url 'getallproduct' %}",
+        type: "GET",
+        dataSrc: "",
+      },
+      columns: [
+        { data: "PId" },
+        { data: "ProductCode" },
+        { data: "PName" },
+        { data: "Price" },
+        { data: "ProductDetails" },
+        { data: "DiscountPrice" },
+        { data: "DiscountPercentage" },
+        { data: "Rating" },
+        // { "data": "ProductImgPath" },
+        {
+          data: "ProductImgPath",
+          render: function (data, type, row) {
+            return '<img src="' + data + '" width="70%">';
+          },
+        },
+        { data: "SizeSQty" },
+        { data: "SizeMQty" },
+        { data: "SizeLQty" },
+        { data: "SizeXLQty" },
+        { data: "SizeXXLQty" },
+        { data: "Size3XLQty" },
+        { data: "Category" },
+        { data: "CreatedBy" },
+        { data: "CreatedOn" },
+        { data: "ModifiedBy" },
+        { data: "ModifyedOn" },
+        {
+          data: null,
+          render: function (data, type, row) {
+            // return '<button type="button" class="btn btn-default btn_edit" click="EditProduct(' + JSON.stringify(row) + ')">Edit</button>&nbsp;&nbsp;' +
+            //     '<button type="button" class="btn btn-default btn_delete">Delete</button>';
+            return (
+              '<button type="button" class="btn btn-default btn_edit">Edit</button>&nbsp;&nbsp;' +
+              '<button type="button" class="btn btn-default btn_delete">Delete</button>'
+            );
+          },
+        },
+      ],
+      lengthChange: false,
+      autoWidth: false,
+    });
+
+    // Delete Data
+    $("#table").on("click", ".btn_delete", function () {
+      var DataRow = table.row($(this).closest("tr")).data();
+      DeleteProduct(DataRow.PId);
+    });
+
+    // Update
+    $("table").on("click", ".btn_edit", function () {
+      // $('#modal').modal('show');
+      GetSubCat2();
+      var rowData = table.row($(this).closest("tr")).data();
+      $("#subcat2").val(rowData.Category);
+      $("#ProductCode").val(rowData.ProductCode);
+      $("#ProductName").val(rowData.PName);
+      $("#ProductDetails").val(rowData.ProductDetails);
+      $("#ProductDescription").val(rowData.ProductDescription);
+      $("#ProductDetails").val(rowData.ProductDetails);
+      $("#Price").val(rowData.Price);
+      $("#Discount-Percentage").val(rowData.DiscountPercentage);
+      $("#Discount-Price").val(rowData.DiscountPrice);
+      $("#ProductImgPath").val(""); // This should not display existing image path
+      $("#SizeSQty").val(rowData.SizeSQty);
+      $("#SizeMQty").val(rowData.SizeMQty);
+      $("#SizeLQty").val(rowData.SizeLQty);
+      $("#SizeXLQty").val(rowData.SizeXLQty);
+      $("#SizeXXLQty").val(rowData.SizeXXLQty);
+      $("#Size3XLQty").val(rowData.Size3XLQty);
+      $("#get_users").val(rowData.CreatedBy);
+      $("#PId").val(rowData.PId);
+      // Display existing image
+      $("#filenameDisplay").html(
+        '<img src="' + rowData.ProductImgPath + '" width="100">'
+      );
+      $("#modal").modal("show");
+      $("#btn_publish").click(function () {
+        AddDate();
+      });
+      // AddDate()
+    });
+  });
+
+  // Close and clear modal function
+  function CloseModal() {
+    $("#modal form")[0].reset();
+    $("#modal").modal("hide");
+  }
+
+  // Get Data Of Sub Cat 2
+  function GetSubCat2() {
+    $.ajax({
+      type: "get",
+      url: "/getsubcat2",
+      dataType: "json",
+      success: function (data) {
+        // console.log(data.id+'=>'+data.name)
+        for (var i = 0; i<data.length; i++) {
+          $("#subcat2").append(
+            '<option value="' + data[i].id + '">' + data[i].name + "</option>"
+          );
+        }
+      },
+    });
+  }
+
+  // Enter Data
+  function AddDate() {
+    var form_data = new FormData(document.getElementById("product_form"));
+    $.ajax({
+      type: "post",
+      url: "/newproduct",
+      dataType: "json",
+      processData: false,
+      contentType: false,
+      headers: {
+        "X-CSRFToken": csrftoken,
+      },
+      data: form_data,
+      success: function (data) {
+        if (data.ResponseStauts) {
+          table.ajax.reload();
+          CloseModal();
+        }
+      },
+      error: function (error) {
+        console.error("Error:", error);
+      },
+    });
+    // for (var pair of form_data.entries()) {
+    //     console.log(pair[0] + ': ' + pair[1]);
+    // }
+    // CloseModal();
+  }
+
+  // Delete the existing product
+  function DeleteProduct(id) {
+    $.ajax({
+      type: "get",
+      url: "deleteproduct/" + id,
+      dataType: "json",
+      success: function (data) {
+        if (data.ResponseStatus) {
+          table.ajax.reload();
+        } else {
+          console.error(data.ResponseMessage);
+        }
+      },
+      error: function (error) {
+        console.error("AJAX Error:", error);
+      },
+    });
+  }
+</script>
+
+{% endblock %}

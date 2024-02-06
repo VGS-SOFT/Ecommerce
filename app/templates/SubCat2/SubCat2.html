@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% block tags %}
+{% load static %}
+{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
+<link rel="stylesheet" href="{% static 'plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}">
+{% endblock stylesheets %}
+{% block content %}
+<!-- Form -->
+<div class="card card-primary">
+    <div class="card-header">
+        <h3 class="card-title">Sub Category 1</h3>
+    </div>
+    <form id="getformdata">
+        {% csrf_token %}
+        <div class="card-body">
+            <div class="form-group">
+                <label>Category</label>
+                <select class="form-control" name='idofmastclass' id="dropdown_catmaster">
+                    <!-- Get Data From Ajax -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="SubCatName1">Category Name</label>
+                <input type="text" class="form-control" name="SubCatName1" id="SubCatName1"
+                    placeholder="Enter Category Name">
+            </div>
+        </div>
+        <div class="card-footer">
+            <button type="button" id='btn_addData' class="btn btn-primary">Submit</button>
+            <ul class='ulAppend'>
+            </ul>
+        </div>
+    </form>
+</div>
+<!-- End -->
+
+<!-- Table -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Categories</h3>&nbsp;&nbsp;&nbsp;&nbsp;
+        <!-- <button class="btn btn-default" id="btn_product">Add new product</button> -->
+    </div>
+    <div class="card-body">
+        <table id="table" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Category Id</th>
+                    <th>Category Name</th>
+                    <th>Master Cat Ref</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!--Getting data by ajax-->
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- End -->
+
+
+{% endblock %}
+{% block extrascripts %}
+<script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/jszip/jszip.min.js' %}"></script>
+<script src="{% static 'plugins/pdfmake/pdfmake.min.js' %}"></script>
+<script src="{% static 'plugins/pdfmake/vfs_fonts.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+{% csrf_token %}
+<script>
+    var csrftoken = $('[name=csrfmiddlewaretoken]').val();
+    $(document).ready(function () {
+        debugger
+        function getmastclassdata() {
+            $.ajax({
+                type: 'get',
+                url: "{% url 'getthedata' %}",
+                dataType: 'json',
+                success: function (data) {
+                    for (var i = 0; i < data.length; i++) {
+                        $('#dropdown_catmaster').append('<option value="' + data[i].id + '">' + data[i].name + '</option>')
+                    }
+                }
+            });
+        }
+        getmastclassdata()
+
+        // Data table
+        table = $('#table').DataTable({
+            paging: false,
+            // pageLength: 4,
+            // lengthMenu: [4,8,12,16,100],
+            scrollX: true, // Enable horizontal scrolling
+            scrollCollapse: true,
+            scrollY: '254px',
+            "ajax": {
+                "url": "/getsubcat2",
+                "type": "GET",
+                "dataSrc": ""
+            },
+            "columns": [
+                { "data": "id" },
+                { "data": "name" },
+                { "data": "ref" },
+                {
+                    "data": null,
+                    "render": function (data, type, row) {
+
+                        // return '<button type="button" class="btn btn-default btn_edit" click="EditProduct(' + JSON.stringify(row) + ')">Edit</button>&nbsp;&nbsp;' +
+                        //     '<button type="button" class="btn btn-default btn_delete">Delete</button>';
+                        return '<button type="button" class="btn btn-default btn_edit">Edit</button>&nbsp;&nbsp;' +
+                            '<button type="button" class="btn btn-default btn_delete">Delete</button>';
+                    }
+                }
+            ],
+            "lengthChange": false,
+            "autoWidth": false
+        });
+
+
+        $('#btn_addData').click(function () {
+            var form_data = new FormData(document.getElementById('getformdata'));
+            $.ajax({
+                type: 'post',
+                url: '/addsubcat2',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                data: form_data,
+                success: function (data) {
+                    if (data.ResponseStatus) {
+                        $('#SubCatName1').val('');
+                        table.ajax.reload()
+                    }
+                }
+            });
+        });
+
+
+        $('#table').on('click', '.btn_delete', function () {
+            var DataRow = table.row($(this).closest("tr")).data();
+            DeleteProduct(DataRow.id);
+        });
+
+        function DeleteProduct(id) {
+            $.ajax({
+                type: 'get',
+                url: 'deletesubcat1/' + id,
+                dataType: 'json',
+                success: function (data) {
+                    if (data.ResponseStatus) {
+                        table.ajax.reload();
+                    }
+                    else {
+                        console.error(data.ResponseMessage);
+                    }
+                },
+                error: function (error) {
+                    console.error('AJAX Error:', error);
+                }
+            });
+        }
+        $('#table').on('click', '.btn_delete', function () {
+            var DataRow = table.row($(this).closest("tr")).data();
+            DeleteProduct(DataRow.id);
+        });
+
+        function DeleteProduct(id) {
+            $.ajax({
+                type: 'get',
+                url: 'deletesubcat2/' + id,
+                dataType: 'json',
+                success: function (data) {
+                    if (data.ResponseStatus) {
+                        table.ajax.reload();
+                    }
+                    else {
+                        console.error(data.ResponseMessage);
+                    }
+                },
+                error: function (error) {
+                    console.error('AJAX Error:', error);
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

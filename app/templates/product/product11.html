@@ -1,0 +1,416 @@
+{% extends 'base.html' %}
+{% block tags %}
+{% load static %}
+{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
+<link rel="stylesheet" href="{% static 'plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}">
+{% endblock stylesheets %}
+
+{% block content %}
+<!-- New Data -->
+<!-- Modal Start -->
+<div class="modal fade" id="modal">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Product</h4>
+                <button type="button" class="close" id="close_btn" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="addnewproduct" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="PId" id="PId" value="0">
+                    <div class="card-body">
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">Category</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" name="subcat2" id="subcat2">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="Product Code" class="col-sm-2 col-form-label">Product Code</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="product_code" class="form-control" id="ProductCode"
+                                    placeholder="Product Code">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="Product Name" class="col-sm-2 col-form-label">Product Name</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="product_name" id="ProductName"
+                                    placeholder="Product Name">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="Product Description" class="col-sm-2 col-form-label">Product Description</label>
+                            <div class="col-sm-10">
+                                <textarea class="form-control" id="Product Description"
+                                    placeholder="Product Description" name="product_description"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="Product Details" class="col-sm-2 col-form-label">Product Details</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="product_detail" id="ProductDetails"
+                                    placeholder="Product Details">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="Price" class="col-sm-2 col-form-label">Price</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="price" id="Price" placeholder="Price">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="Discount Percentage" class="col-sm-2 col-form-label">Discount Percentage</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="discount_percentage" class="form-control"
+                                    id="Discount-Percentage" placeholder="Discount Percentage">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="Discount Price" class="col-sm-2 col-form-label">Discount Price</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="discount_price" class="form-control" id="Discount-Price"
+                                    readonly>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="ProductImgPath" class="col-sm-2 col-form-label">Product Image</label>
+                            <div class="col-sm-10">
+                                <input type="file" name="path" id="ProductImgPath" placeholder="ProductImgPath">
+                                <span id="filenameDisplay"></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="SizeSQty" class="col-sm-2 col-form-label">SizeSQty</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="s" id="SizeSQty" placeholder="SizeSQty">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="SizeMQty" class="col-sm-2 col-form-label">SizeMQty</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="m" id="SizeMQty" placeholder="SizeMQty">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="SizeLQty" class="col-sm-2 col-form-label">SizeLQty</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="l" id="SizeLQty" placeholder="SizeLQty">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="SizeXLQty" class="col-sm-2 col-form-label">SizeXLQty</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="xl" id="SizeXLQty"
+                                    placeholder="SizeXLQty">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="SizeXXLQty" class="col-sm-2 col-form-label">SizeXXLQty</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="xxl" id="SizeXXLQty"
+                                    placeholder="SizeXXLQty">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="Size3XLQty" class="col-sm-2 col-form-label">Size3XLQty</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="3xl" id="Size3XLQty"
+                                    placeholder="Size3XLQty">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="CreatedBy" class="col-sm-2 col-form-label">CreatedBy</label>
+                            <div class="col-sm-10">
+                                <select class="form-control" id="get_users" name="User">
+                                    <!-- It will be ydnamically used by ajax -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="button" class="btn btn-info" id="btn_save_draft">Save as Draft</button>
+                        <button type="button" id="btn_addnewdata" class="btn btn-info">Publish</button>
+                        <button type="button" id="btn_cancel_newproduct"
+                            class="btn btn-default float-right">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End -->
+
+<!-- Update Modal -->
+<!-- End Modal -->
+
+<!-- Data Table -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">All Product's</h3>&nbsp;&nbsp;&nbsp;&nbsp;
+        <button class="btn btn-default" id="btn_newproduct">Add new product</button>
+    </div>
+    <div class="card-body">
+        <table id="table" class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>PId</th>
+                    <th>Product Code</th>
+                    <th>Product Name</th>
+                    <th>Price</th>
+                    <th>ProductDetails</th>
+                    <th>Discount Price</th>
+                    <th>Discount Percentage</th>
+                    <th>Rating</th>
+                    <th>Product Img</th>
+                    <th>Size S Qty</th>
+                    <th>Size M Qty</th>
+                    <th>Size L Qty</th>
+                    <th>Size XL Qty</th>
+                    <th>Size XXL Qty</th>
+                    <th>Size 3XL Qty</th>
+                    <th>Category</th>
+                    <th>Created By</th>
+                    <th>CreatedOn</th>
+                    <th>Modified By</th>
+                    <th>Modified On</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!--Getting data by ajax-->
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- End -->
+{% endblock %}
+
+<!-- ... (Other script includes) ... -->
+{% block extrascripts %}
+<script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/jszip/jszip.min.js' %}"></script>
+<script src="{% static 'plugins/pdfmake/pdfmake.min.js' %}"></script>
+<script src="{% static 'plugins/pdfmake/vfs_fonts.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+{% csrf_token %}
+
+<script>
+    var csrftoken = $('[name=csrfmiddlewaretoken]').val();
+    $(document).ready(function () {
+        function insertproduct() {
+            var form_data = new FormData($('#addnewproduct')[0]);
+            $.ajax({
+                type: 'POST',
+                url: '{% url "addnewproduct" %}',
+                data: form_data,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                success: function (data) {
+                    debugger
+                    if (data.ResponseStatus) {
+                        table.ajax.reload();
+                        $('#addnewproduct')[0].reset();
+                        $('#filenameDisplay').empty()
+                        $('#modal').modal('hide');
+                    }
+                }
+            });
+        }
+        // Open modal
+        $('#btn_newproduct').click(function () {
+            $('#filenameDisplay').empty()
+            $('#addnewproduct')[0].reset();
+            $('#modal').modal('show');
+            // get data from category master
+            function getmastcat() {
+                $.ajax({
+                    type: 'post',
+                    url: "{% url 'getsubcat2' %}",
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        var selectElement = $('#subcat2');
+                        selectElement.empty();
+                        data.forEach(function (category) {
+                            selectElement.append('<option value="' + category.id + '">' + category.name + '</option>');
+                        });
+                    },
+                    error: function (error) {
+                        console.error("Error fetching categories:", error);
+                    }
+                });
+            }
+            getmastcat();
+
+            // get every user
+            function getusers() {
+                $.ajax({
+                    type: 'post',
+                    url: "{% url 'getallusers' %}",
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    dataType: "json",
+                    success: function (data) {
+                        var selectElement = $('#get_users');
+                        selectElement.empty();
+                        data.forEach(function (category) {
+                            selectElement.append('<option id="llop" value="' + category.id + '">' + category.name + '</option>');
+                        });
+                    },
+                    error: function (error) {
+                        console.error("Error fetching categories:", error);
+                    }
+                });
+            }
+            getusers();
+
+            // Disacount price
+            $('#Discount-Percentage').on('input', function () {
+                var price = $('#Price').val()
+                var discount = $('#Discount-Percentage').val()
+                var dp = price - (((discount) * (price)) / 100)
+                $('#Discount-Price').val(dp)
+            });
+
+            // insert and update the product
+            $('#btn_addnewdata').click(() => insertproduct());
+        });
+        table = $('#table').DataTable({
+            paging: false,
+            // pageLength: 4,
+            // lengthMenu: [4,8,12,16,100],
+            scrollX: true, // Enable horizontal scrolling
+            scrollCollapse: true,
+            scrollY: '254px',
+            "ajax": {
+                "url": "{% url 'getallproduct' %}",
+                "type": "GET",
+                "dataSrc": ""
+            },
+            "columns": [
+                { "data": "PId" },
+                { "data": "ProductCode" },
+                { "data": "PName" },
+                { "data": "Price" },
+                { "data": "ProductDetails" },
+                { "data": "DiscountPrice" },
+                { "data": "DiscountPercentage" },
+                { "data": "Rating" },
+                // { "data": "ProductImgPath" },
+                {
+                    "data": "ProductImgPath",
+                    "render": function (data, type, row) {
+                        return '<img src="' + data + '" width="70%">';
+                    }
+                },
+                { "data": "SizeSQty" },
+                { "data": "SizeMQty" },
+                { "data": "SizeLQty" },
+                { "data": "SizeXLQty" },
+                { "data": "SizeXXLQty" },
+                { "data": "Size3XLQty" },
+                { "data": "Category" },
+                { "data": "CreatedBy" },
+                { "data": "CreatedOn" },
+                { "data": "ModifiedBy" },
+                { "data": "ModifyedOn" },
+                {
+                    "data": null,
+                    "render": function (data, type, row) {
+
+                        // return '<button type="button" class="btn btn-default btn_edit" click="EditProduct(' + JSON.stringify(row) + ')">Edit</button>&nbsp;&nbsp;' +
+                        //     '<button type="button" class="btn btn-default btn_delete">Delete</button>';
+                        return '<button type="button" class="btn btn-default btn_edit">Edit</button>&nbsp;&nbsp;' +
+                            '<button type="button" class="btn btn-default btn_delete">Delete</button>';
+                    }
+                }
+            ],
+            "lengthChange": false,
+            "autoWidth": false
+        });
+
+
+        // $('#table tbody').on('click', '.btn_edit', function () {
+        //     $('#modal').modal('show')
+        //     var rowData = table.row($(this).closest("tr")).data();
+        //     $('#subcat2').val(rowData.Category);
+        //     $('#ProductCode').val(rowData.ProductCode);
+        //     $('#ProductName').val(rowData.PName);
+        //     $('#ProductDetails').val(rowData.ProductDetails);
+        //     $('#ProductDescription').val(rowData.ProductDescription);
+        //     $('#ProductDetails').val(rowData.ProductDetails);
+        //     $('#Price').val(rowData.Price);
+        //     $('#Discount-Percentage').val(rowData.DiscountPercentage);
+        //     $('#Discount-Price').val(rowData.DiscountPrice);
+        //     $('#SizeSQty').val(rowData.SizeSQty);
+        //     $('#SizeMQty').val(rowData.SizeMQty);
+        //     $('#SizeLQty').val(rowData.SizeLQty);
+        //     $('#SizeXLQty').val(rowData.SizeXLQty);
+        //     $('#SizeXXLQty').val(rowData.SizeXXLQty);
+        //     $('#Size3XLQty').val(rowData.Size3XLQty);
+        //     $('#get_users').val(rowData.CreatedBy);
+        //     $('#PId').val(rowData.PId);
+        //     $('#filenameDisplay').html('<img src="' + rowData.ProductImgPath + '" width="100">' +
+        //         '<p>Image Path: ' + rowData.ProductImgPath + '</p>');
+        //     $('#modal').modal('show');
+        // })
+        $('#table tbody').on('click', '.btn_edit', function () {
+            // Disacount price
+            $('#Discount-Percentage').on('input', function () {
+                var price = $('#Price').val()
+                var discount = $('#Discount-Percentage').val()
+                var dp = price - (((discount) * (price)) / 100)
+                $('#Discount-Price').val(dp)
+            });
+            var rowData = table.row($(this).closest("tr")).data();
+            $('#subcat2').val(rowData.Category);
+            $('#ProductCode').val(rowData.ProductCode);
+            $('#ProductName').val(rowData.PName);
+            $('#ProductDetails').val(rowData.ProductDetails);
+            $('#ProductDescription').val(rowData.ProductDescription);
+            $('#ProductDetails').val(rowData.ProductDetails);
+            $('#Price').val(rowData.Price);
+            $('#Discount-Percentage').val(rowData.DiscountPercentage);
+            $('#Discount-Price').val(rowData.DiscountPrice);
+            // $('#ProductImgPath').val(rowData.ProductImgPath); // This should not display existing image path
+            $('#SizeSQty').val(rowData.SizeSQty);
+            $('#SizeMQty').val(rowData.SizeMQty);
+            $('#SizeLQty').val(rowData.SizeLQty);
+            $('#SizeXLQty').val(rowData.SizeXLQty);
+            $('#SizeXXLQty').val(rowData.SizeXXLQty);
+            $('#Size3XLQty').val(rowData.Size3XLQty);
+            $('#get_users').val(rowData.CreatedBy);
+            $('#PId').val(rowData.PId);
+            $('#filenameDisplay').html('<img src="' + rowData.ProductImgPath + '" width="100">');
+            $('#modal').modal('show');
+            $('#btn_addnewdata').click(() => insertproduct());
+        });
+    });
+</script>
+
+{% endblock %}

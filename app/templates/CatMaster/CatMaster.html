@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% block tags %}
+{% load static %}
+{% endblock %}
+{% block stylesheets %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+<link rel="stylesheet" href="{% static 'plugins/fontawesome-free/css/all.min.css' %}">
+<link rel="stylesheet" href="{% static 'plugins/datatables-bs4/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'plugins/datatables-responsive/css/responsive.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'dist/css/adminlte.min.css' %}">
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="row mb-2">
+  <div class="col-sm-6">
+    <h1>Category Master</h1>
+  </div>
+  <div class="col-sm-6">
+    <ol class="breadcrumb float-sm-right">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item active">Category Master</li>
+    </ol>
+  </div>
+</div>
+
+<!-- Add New Category-->
+<div class="card card-primary">
+  <div class="card-header">
+    <h3 class="card-title">Add New Master Category</h3>
+  </div>
+  <form name="newcatmast" id="NewCatMast">
+    <div class="card-body">
+      <div class="form-group">
+        <label for="CategoryMasterName">Category Name</label>
+        <input type="text" class="form-control" name="catmastername" id="CategoryMasterName"
+          placeholder="Enter Category Name">
+      </div>
+    </div>
+    <div class="card-footer">
+      <button type="button" id="btn_add_newdata" class="btn btn-primary">Submit</button>
+    </div>
+  </form>
+</div>
+<!-- End -->
+
+<!-- Data Table -->
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">DataTable with default features</h3>
+  </div>
+  <div class="card-body">
+    <table id="example1" class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>User</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!--Getting data by ajax-->
+      </tbody>
+    </table>
+  </div>
+</div>
+<!-- End -->
+
+<!-- Update Modal -->
+<div class="modal fade" id="modal-xl">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Exisitng Category</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="CategoryMaster">Category Name</label>
+            <input type="text" class="form-control" name="catmastername" id="CatMasterOne">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-control" name="catmasterid" id="catid" hidden>
+          </div>
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" id="btn_save_data" class="btn btn-primary">Save changes</button>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- End -->
+{% endblock %}
+
+
+{% block extrascripts %}
+<script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-responsive/js/responsive.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.bootstrap4.min.js' %}"></script>
+<script src="{% static 'plugins/jszip/jszip.min.js' %}"></script>
+<script src="{% static 'plugins/pdfmake/pdfmake.min.js' %}"></script>
+<script src="{% static 'plugins/pdfmake/vfs_fonts.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
+<script src="{% static 'plugins/datatables-buttons/js/buttons.colVis.min.js' %}"></script>
+{% csrf_token %}
+<script>
+  //update-data
+  $(document).ready(function () {
+    var table = $('#example1').DataTable({
+      paging: false,
+      scrollCollapse: true,
+      scrollY: '254px',
+      "ajax": {
+        "type": "GET",
+        "url": "/getallcatmaster",
+        "dataSrc": ""
+      },
+      "columns": [
+        { "data": "CatId" },
+        { "data": "CatName" },
+        {
+          "data": null,
+          "render": function (data, type, row) {
+            return '<button type="button" class="btn btn-default btn_edit">Edit</button>&nbsp;&nbsp;' +
+              '<button type="button" class="btn btn-default btn_delete">Delete</button>';
+          }
+        }
+      ],
+      "responsive": true,
+      "lengthChange": false,
+      "autoWidth": false
+    });
+    var csrftoken = $('[name=csrfmiddlewaretoken]').val();
+
+    // Open Modal
+    $('#example1').on('click', '.btn_edit', function () {
+      var rowData = table.row($(this).closest("tr")).data();
+      var catId = rowData.CatId;
+      var catName = rowData.CatName;
+      $("#CatMasterOne").val(catName);
+      $("#catid").val(catId);
+      $("#modal-xl").modal("show");
+    });
+
+    // Update the data
+    $("#btn_save_data").click(function () {
+      var catId = $("#catid").val();
+      var CatNameAfterUpdate = $('#CatMasterOne').val();
+      $.ajax({
+        type: 'post',
+        url: '/updatecategory',
+        headers: {
+          'X-CSRFToken': csrftoken
+        },
+        data: JSON.stringify({
+          'new_data': CatNameAfterUpdate,
+          'id': catId
+        }),
+        dataType: 'json',
+        success: function (data) {
+          if (data.ResponseStatus) {
+            $("#modal-xl").modal("hide");
+            table.ajax.reload();
+          }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          console.error("Ajax error:", textStatus, errorThrown);
+        }
+      });
+    });
+
+    // Add New Data
+    $("#btn_add_newdata").click(function () {
+      var new_form = new FormData($('#NewCatMast')[0])
+      var NewCatMastName = $("#CategoryMasterName").val()
+      if (NewCatMastName) {
+        $.ajax({
+          type: 'post',
+          headers: {
+            'X-CSRFToken': csrftoken
+          },
+          url: '/addcatmaster',
+          data: new_form,
+          processData: false,  // important! tell jQuery not to process the data
+          contentType: false,
+          dataType: 'json',
+          success: function (data) {
+            if (data.ResponseStatus) {
+              table.ajax.reload();
+              $("#CategoryMasterName").val("");
+            }
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            console.error("Ajax error:", textStatus, errorThrown);
+          }
+        });
+      } else {
+        alert("Empty Value Cannot Be Entered")
+      }
+    });
+
+    // Reload After adding Data
+    $('#example1').on('click', '.btn_delete', function () {
+      var DeleteData = table.row($(this).closest("tr")).data();
+      var deletedCatId = DeleteData.CatId;
+      $.ajax({
+        type: 'post',
+        headers: {
+          'X-CSRFToken': csrftoken
+        },
+        url: '/deletecatmaster/' + deletedCatId,
+        dataType: 'json',
+        success: function (data) {
+          if (data.ResponseStatus) {
+            table.ajax.reload();
+          }
+        }
+      })
+    });
+  });
+</script>
+
+{% endblock %}
